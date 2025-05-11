@@ -1,0 +1,108 @@
+body {
+	display: flex;
+	flex-direction: row;
+	margin: 0;
+	height: 100vh;
+	border: 0;
+	padding: 0;
+	box-sizing: border-box;
+	vertical-align: baseline;
+	font-family: Arial, sans-serif;
+	font-size: 14px;
+}
+
+header {
+	position: relative;
+	z-index: 1;
+	background-color: white;
+	opacity: 0.9;
+	box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	row-gap: 10px;
+	height: 100vh;
+	padding: 0 20px 0 20px;
+}
+
+.latex-display {
+	position: relative;
+	z-index: 1;
+	margin: 20px;
+}
+
+h1 {
+	color: black;
+}
+
+#inputs {
+	width: 90%;
+	border-color: #cfced5;
+	border-radius: 8px;
+	color: black;
+	font-weight: bold;
+}
+
+/* Visualização do Grafo Direcionado (Dígrafo)*/
+#grafo-exibicao {
+    width: 100%;
+    height: 100vh;
+    background-color: #d7d7d7;
+    background-image: radial-gradient(circle, #000000ff 1px, transparent 1px);
+    background-size: 40px 40px; /* Base para ajuste dinâmico */
+    position: absolute;
+    transform-origin: center;
+}
+
+.link {
+	stroke: #9dbaea;
+	stroke-width: 2px;
+	marker-end: url(#arrow);
+}
+
+.node circle {
+	fill: #fe4b58;
+	stroke: #cfced5;
+	stroke-width: 1.5px;
+}
+
+.node text {
+	fill: white;
+	font-size: 20px;
+	text-anchor: middle;
+	/* alignment-baseline: middle; */
+	user-select: none;
+}
+
+.latex-display {
+	color: white;
+	font-size: 30px;
+
+	& #matriz math {
+		background: radial-gradient(circle at center, rgb(0 0 0 / 48%) 0%, rgb(0 0 0 / 0%) 50%);
+		padding: 1rem;
+		border-radius: 8px;
+	}
+
+	& #lista mtd {
+		text-align: left;
+	}
+
+
+}
+
+.katex-html {
+	display: none;
+}
+
+.hidden {
+	display: none;
+}
+
+.verdadeiro {
+	color: green;
+}
+
+.falso {
+	color: red;
+}
