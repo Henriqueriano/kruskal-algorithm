@@ -260,15 +260,15 @@ async function trocarExemplo(evento) {
 }
 
 async function atualizarMatrizAdjacencia() {
-	let exibirRotulos = document.querySelector('#exibir-rotulos');
-	let exemplo = document.querySelector('select#preset');
-	let resposta = await fetch(`/matriz/${exemplo.value}?rotulo=${exibirRotulos.checked}`);
-	if (!resposta.ok) {
-		throw resposta.ok;
-	}
-	let matriz = await resposta.text();
-	let latex = `\\begin{bmatrix}\n${matriz}\n\\end{bmatrix}`;
-	katex.render(latex, document.querySelector('#matriz'), { throwOnError: true, });
+	// let exibirRotulos = document.querySelector('#exibir-rotulos');
+	// let exemplo = document.querySelector('select#preset');
+	// let resposta = await fetch(`/matriz/${exemplo.value}?rotulo=${exibirRotulos.checked}`);
+	// if (!resposta.ok) {
+	// 	throw resposta.ok;
+	// }
+	// let matriz = await resposta.text();
+	// let latex = `\\begin{bmatrix}\n${matriz}\n\\end{bmatrix}`;
+	// katex.render(latex, document.querySelector('#matriz'), { throwOnError: true, });
 }
 
 async function toggleMatrizAdjacencia() {
@@ -285,13 +285,13 @@ async function toggleMatrizAdjacencia() {
 
 
 async function atualizarListaAdjacencia() {
-	let exemplo = document.querySelector('select#preset');
-	let resposta = await fetch(`/lista/${exemplo.value}`);
-	if (!resposta.ok) {
-		throw resposta.ok;
-	}
-	let lista = await resposta.text();
-	katex.render(lista, document.querySelector('#lista'), { throwOnError: true, });
+	// let exemplo = document.querySelector('select#preset');
+	// let resposta = await fetch(`/lista/${exemplo.value}`);
+	// if (!resposta.ok) {
+	// 	throw resposta.ok;
+	// }
+	// let lista = await resposta.text();
+	// katex.render(lista, document.querySelector('#lista'), { throwOnError: true, });
 }
 
 async function toggleListaAdjacencia() {
@@ -307,38 +307,38 @@ async function toggleListaAdjacencia() {
 }
 
 function atualizarListaDeNodes() {
-	let de = document.querySelector('#select-de');
-	let para = document.querySelector('#select-para');
-	de.innerHTML = '';
-	para.innerHTML = '';
-
-	for (let i = 0; i < nodes.length; i++) {
-		de.innerHTML += `<option value="${nodes[i].id}">${nodes[i].id}</option>`;
-		para.innerHTML += `<option value="${nodes[i].id}">${nodes[i].id}</option>`;
-	}
+	// let de = document.querySelector('#select-de');
+	// let para = document.querySelector('#select-para');
+	// de.innerHTML = '';
+	// para.innerHTML = '';
+	//
+	// for (let i = 0; i < nodes.length; i++) {
+	// 	de.innerHTML += `<option value="${nodes[i].id}">${nodes[i].id}</option>`;
+	// 	para.innerHTML += `<option value="${nodes[i].id}">${nodes[i].id}</option>`;
+	// }
 }
 
 
 async function atualizarGrausNos() {
-	try{
-		let exemplo = document.querySelector('select#preset');
-	let resposta = await fetch(`/grau/${exemplo.value}`);
-	if (!resposta.ok) {
-		throw resposta.ok;
-	}
-	let graus = await resposta.json();
-
-	let latex = "\\begin{array}{l}\n";
-	for (let rotulo in graus) {
-		let g = graus[rotulo];
-		latex += `${rotulo}: \\text{entrada } ${g.entrada}, \\text{saída } ${g.saida} \\\\\n`;
-	}
-	latex += "\\end{array}";
-
-	katex.render(latex, document.querySelector('#graus-nos'), { throwOnError: true });
-	} catch (e) {
-		console.error("Erro ao atualizar graus dos nós:", e);
-	}
+	// try{
+	// 	let exemplo = document.querySelector('select#preset');
+	// let resposta = await fetch(`/grau/${exemplo.value}`);
+	// if (!resposta.ok) {
+	// 	throw resposta.ok;
+	// }
+	// let graus = await resposta.json();
+	//
+	// let latex = "\\begin{array}{l}\n";
+	// for (let rotulo in graus) {
+	// 	let g = graus[rotulo];
+	// 	latex += `${rotulo}: \\text{entrada } ${g.entrada}, \\text{saída } ${g.saida} \\\\\n`;
+	// }
+	// latex += "\\end{array}";
+	//
+	// katex.render(latex, document.querySelector('#graus-nos'), { throwOnError: true });
+	// } catch (e) {
+	// 	console.error("Erro ao atualizar graus dos nós:", e);
+	// }
 	
 }
 
@@ -368,90 +368,90 @@ let tipoCheia = document.querySelector('#tipo-cheia');
 let exemplo = document.querySelector('select#preset');
 
 function atualizarSelectArvoreRaiz() {
-	arvoreNodeRaiz.innerHTML = '';
-	if (nodes.length === 0)  {
-		arvoreNodeRaiz.innerHTML = `<option value=""></option>`;
-	} else {
-		for (let i = 0; i < nodes.length; i++) {
-			arvoreNodeRaiz.innerHTML += `<option value="${nodes[i].id}">${nodes[i].id}</option>`;
-		}
-	}
+	// arvoreNodeRaiz.innerHTML = '';
+	// if (nodes.length === 0)  {
+	// 	arvoreNodeRaiz.innerHTML = `<option value=""></option>`;
+	// } else {
+	// 	for (let i = 0; i < nodes.length; i++) {
+	// 		arvoreNodeRaiz.innerHTML += `<option value="${nodes[i].id}">${nodes[i].id}</option>`;
+	// 	}
+	// }
 }
 
 async function atualizarTiposDoGrafo() {
-
-	let resposta = await fetch(
-		`/tipo/${exemplo.value}?raiz=${arvoreNodeRaiz.value}&subgrafo=${checkboxSubgrafo.checked}`
-	);
-	let {arvore, binaria, completa, cheia, gcompleto, lacos, simples} = r = await resposta.json();
-
-	console.log(r);
-
-
-	let f = (x) => {
-		if (x == null) {
-			return 'null';
-		} else if (x) {
-			return 'verdadeiro';
-		} else {
-			return 'falso';
-		}
-	};
-	tipoSimples.textContent = f(simples);
-	tipoSimples.classList.add(f(simples));
-	tipoSimples.classList.remove(f(!simples));
-
-	tipoLacos.textContent = f(lacos);
-	tipoLacos.classList.add(f(lacos));
-	tipoLacos.classList.remove(f(!lacos));
-
-	tipoGrafoCompleto.textContent = f(gcompleto);
-	tipoGrafoCompleto.classList.add(f(gcompleto));
-	tipoGrafoCompleto.classList.remove(f(!gcompleto));
-
-	tipoArvore.textContent = f(arvore);
-	tipoArvore.classList.add(f(arvore));
-	tipoArvore.classList.remove(f(!arvore));
-
-	tipoBinaria.textContent = f(binaria);
-	tipoBinaria.classList.add(f(binaria));
-	tipoBinaria.classList.remove(f(!binaria));
-
-	tipoCompleta.textContent = f(completa);
-	tipoCompleta.classList.add(f(completa));
-	tipoCompleta.classList.remove(f(!completa));
-
-	tipoCheia.textContent = f(cheia);
-	tipoCheia.classList.add(f(cheia));
-	tipoCheia.classList.remove(f(!cheia));
+	//
+	// let resposta = await fetch(
+	// 	`/tipo/${exemplo.value}?raiz=${arvoreNodeRaiz.value}&subgrafo=${checkboxSubgrafo.checked}`
+	// );
+	// let {arvore, binaria, completa, cheia, gcompleto, lacos, simples} = r = await resposta.json();
+	//
+	// console.log(r);
+	//
+	//
+	// let f = (x) => {
+	// 	if (x == null) {
+	// 		return 'null';
+	// 	} else if (x) {
+	// 		return 'verdadeiro';
+	// 	} else {
+	// 		return 'falso';
+	// 	}
+	// };
+	// tipoSimples.textContent = f(simples);
+	// tipoSimples.classList.add(f(simples));
+	// tipoSimples.classList.remove(f(!simples));
+	//
+	// tipoLacos.textContent = f(lacos);
+	// tipoLacos.classList.add(f(lacos));
+	// tipoLacos.classList.remove(f(!lacos));
+	//
+	// tipoGrafoCompleto.textContent = f(gcompleto);
+	// tipoGrafoCompleto.classList.add(f(gcompleto));
+	// tipoGrafoCompleto.classList.remove(f(!gcompleto));
+	//
+	// tipoArvore.textContent = f(arvore);
+	// tipoArvore.classList.add(f(arvore));
+	// tipoArvore.classList.remove(f(!arvore));
+	//
+	// tipoBinaria.textContent = f(binaria);
+	// tipoBinaria.classList.add(f(binaria));
+	// tipoBinaria.classList.remove(f(!binaria));
+	//
+	// tipoCompleta.textContent = f(completa);
+	// tipoCompleta.classList.add(f(completa));
+	// tipoCompleta.classList.remove(f(!completa));
+	//
+	// tipoCheia.textContent = f(cheia);
+	// tipoCheia.classList.add(f(cheia));
+	// tipoCheia.classList.remove(f(!cheia));
 }
 
 async function atualizarGrauTotal() {
-	try {
-		let exemplo = document.querySelector('select#preset');
-		let resposta = await fetch(`/grau-total/${exemplo.value}`);
-		if (!resposta.ok) {
-			throw resposta.status;
-		}
-		let { grau_total } = await resposta.json();
-
-		let latex = `\\text{Grau total do grafo: } ${grau_total}`;
-		katex.render(latex, document.querySelector('#grau-total'), { throwOnError: true });
-	} catch (e) {
-		console.error("Erro ao obter grau total:", e);
-	}
-}
-
-async function toggleGrauTotal() {
-	let grau = document.querySelector('#grau-total');
-	let butao = document.querySelector('#grau-total-toggle');
-	grau.classList.toggle('hidden');
-	if (grau.classList.contains('hidden')) {
-		butao.textContent = 'Exibir';
-	} else {
-		butao.textContent = 'Esconder';
-		await atualizarGrauTotal();
-	}
+// 	try {
+// 		let exemplo = document.querySelector('select#preset');
+// 		let resposta = await fetch(`/grau-total/${exemplo.value}`);
+// 		if (!resposta.ok) {
+// 			throw resposta.status;
+// 		}
+// 		let { grau_total } = await resposta.json();
+//
+// 		let latex = `\\text{Grau total do grafo: } ${grau_total}`;
+// 		katex.render(latex, document.querySelector('#grau-total'), { throwOnError: true });
+// 	} catch (e) {
+// 		console.error("Erro ao obter grau total:", e);
+// 	}
+// }
+//
+// async function toggleGrauTotal() {
+// 	let grau = document.querySelector('#grau-total');
+// 	let butao = document.querySelector('#grau-total-toggle');
+// 	grau.classList.toggle('hidden');
+// 	if (grau.classList.contains('hidden')) {
+// 		butao.textContent = 'Exibir';
+// 	} else {
+// 		butao.textContent = 'Esconder';
+// 		await atualizarGrauTotal();
+// 	}
 }
 
 

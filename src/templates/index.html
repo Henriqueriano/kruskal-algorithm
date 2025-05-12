@@ -1,13 +1,133 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title></title>
-  </head>
-  <body>
-    <div>
-      foobar!!!!!!!
+<html lang="pt">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dígrafos</title>
+  <script src="https://d3js.org/d3.v6.min.js"></script>
+  <script src="https://unpkg.com/d3-force@3"></script>
+  <script src="https://unpkg.com/d3-sankey@0.12"></script>
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/katex.min.js"
+    integrity="sha384-Rma6DA2IPUwhNxmrB/7S3Tno0YY7sFu9WSYMCuulLhIqYSGZ2gKCJWIqhBWqMQfh"
+    crossorigin="anonymous"></script>
+
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+
+<body style="overflow: hidden;">
+  <header style="resize: horizontal; overflow-x: hidden;">
+    <h1>Operações</h1>
+
+    <fieldset id="inputs">
+      <legend>Adicionar Nós</legend>
+      <div>
+        <input id="nameNode" type="text" placeholder="Nome do novo nó..."
+            style="margin-bottom: 10px; display: inline; width: 45%;">
+        <input id="nameNode" type="text" placeholder="Nome do novo nó..."
+            style="margin-bottom: 10px; display: inline; width: 45%;">
+      </div>
+      <form onsubmit="adicionarNode()" action="javascript:void(0)">
+        <button type="submit" onsubmit="" style="width: 100%;">Adicionar</button>
+      </form>
+      <form onsubmit="deletarNode()" action="javascript:void(0)">
+        <button type="submit" onsubmit="" style="width: 100%;">Deletar</button>
+      </form>
+    </fieldset>
+
+    <fieldset id="inputs">
+      <legend>Exemplos</legend>
+      <select onchange="trocarExemplo(event)" id="preset" style="width: 100%;">
+        <option value="principal">Principal</option>
+        <option value="completo">Grafo Completo</option>
+        <option value="binaria">Arvore Binária</option>
+      </select>
+    </fieldset>
+
+    <!-- <fieldset id="inputs"> -->
+    <!--   <legend>Matriz Adjacência</legend> -->
+    <!--   <div style="margin-bottom: 5px;"> -->
+    <!---->
+    <!--     <input type="checkbox" id="exibir-rotulos" value="" style="vertical-align: middle;" -->
+    <!--       onchange="atualizarMatrizAdjacencia()"> -->
+    <!--     <label for="exibir-rotulos" style="vertical-align: middle;">Exibir rótulos</label> -->
+    <!--   </div> -->
+    <!--   <button id="matriz-toggle" type="submit" style="width: 100%" onclick="toggleMatrizAdjacencia()">Exibir</button> -->
+    <!-- </fieldset> -->
+    <!---->
+    <!-- <fieldset id="inputs"> -->
+    <!--   <legend>Lista Adjacência</legend> -->
+    <!--   <button id="lista-toggle" type="submit" style="width: 100%" onclick="toggleListaAdjacencia()">Exibir</button> -->
+    <!-- </fieldset> -->
+    <!---->
+    <!-- <fieldset id="inputs"> -->
+    <!--   <legend>Grau dos Nós</legend> -->
+    <!--   <button id="grau-toggle" type="submit" style="width: 100%" onclick="toggleGrausNos()">Exibir</button> -->
+    <!-- </fieldset> -->
+    <!---->
+    <!-- <fieldset id="inputs"> -->
+    <!--   <legend>Grau Total</legend> -->
+    <!--   <button id="grau-total-toggle" type="submit" style="width: 100%" onclick="toggleGrauTotal()">Exibir</button> -->
+    <!-- </fieldset> -->
+
+    <fieldset id="inputs">
+      <legend>Tipos do grafo</legend>
+      <div>Possui laços: <span id="tipo-lacos"></span></div>
+      <div>Grafo completo: <span id="tipo-grafo-completo"></span></div>
+      <div>Grafo simples: <span id="tipo-simples"></span></div>
+      <hr>
+      <div>
+        <label style="" for="arvore-raiz">Nó raiz:</label>
+        <select onchange="atualizarTiposDoGrafo()" id="arvore-raiz">
+        </select>
+      </div>
+      <input style="vertical-align: middle;" type="checkbox" id="considerar-subgrafo" onchange="atualizarTiposDoGrafo()"
+        checked>
+      <label style="vertical-align: middle;" for="considerar-subgrafo">Considerar subgrafo</label>
+      <div>Árvore: <span id="tipo-arvore"></span></div>
+      <ul style="margin: 0;">
+        <li>
+          <div>Binária: <span id="tipo-binaria"></span></div>
+        </li>
+        <li>
+          <div>Completa: <span id="tipo-completa"></span></div>
+        </li>
+        <li>
+          <div>Cheia: <span id="tipo-cheia"></span></div>
+        </li>
+      </ul>
+    </fieldset>
+
+    <fieldset id="inputs">
+      <legend>Créditos</legend>
+      <button id="creditos-toggle" type="submit" style="width: 100%" onclick="creditos()">Exibir</button>
+    </fieldset>
+  </header>
+
+  <section class="latex-display">
+    <div id="matriz" class="hidden" style="max-width: 200px; color: white;"></div>
+    <div id="lista" class="hidden" style="max-width: 200px; color: white;"></div>
+    <div id="graus-nos" class="hidden" style="max-width: 200px; color: white;"></div>
+    <div id="grau-total" class="hidden" style="max-width: 200px; color: white;"></div>
+    <div id="creditos" class="hidden" style="color: white; font-size: 20px; font-family: serif; max-width: 350px;">
+      <h5>Equipe:</h5>
+      <ul>
+        <li>Breno Ferreira</li>
+        <li>Daniel Augusto</li>
+        <li>Vinicius Teixeira</li>
+        <li>Raphael Braian</li>
+        <li>Daniel Henrique</li>
+      </ul>
+      <h5 style="margin-bottom: 0;">Frase motivacional:</h5>
+      <div>A essência do conhecimento consiste em aplicá-lo, uma vez possuído.</div>
+      <br>
+      <div>-Confúcio</div>
     </div>
-  </body>
+  </section>
+
+  <main id="grafo-exibicao"></main>
+
+  <script src="/static/d3_force.js"></script>
+</body>
+
 </html>
