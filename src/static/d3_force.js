@@ -9,126 +9,103 @@ window.onresize = () => {
 	svg.setAttribute("height", height);
 }
 
-// Declaração dos nós do dígrafo
+// Declaração dos nós da árvore conexa
 var nodes = [
 	{ id: "A" }, { id: "B" }, { id: "C" }, { id: "D" },
 	{ id: "E" }
 ];
 
-// Declaração das conexões direcionadas de cada nó
+// Declaração das arestas valoradas
 var links = [
-	{ source: "A", target: "E" },
-	{ source: "B", target: "D" },
-	{ source: "C", target: "B" },
-	{ source: "D", target: "A" },
-	{ source: "D", target: "C" },
-	{ source: "D", target: "E" },
-	{ source: "E", target: "C" },
-	{ source: "E", target: "C" },
+	{ source: "A", value: 2, target: "B" },
+	{ source: "A", value: 4, target: "C" },
+	{ source: "B", value: 1, target: "C" },
+	{ source: "C", value: 5, target: "D" },
+	{ source: "D", value: 3, target: "E" }
 ];
+
 // D3 usa a referência desses dois objetos para salvar informações essenciais dos nós como posição e etc.
 
 function renderizar(nodes, links) {
-    document.querySelector("#grafo-exibicao").innerHTML = '';
+	document.querySelector("#grafo-exibicao").innerHTML = '';
 	const grafoContainer = document.getElementById("grafo-exibicao");
 
-    const svg = d3.select("#grafo-exibicao").append("svg")
-        .attr("width", width)
-        .attr("height", height)
-        .call(d3.zoom().on("zoom", (event) => { // implementa o zoom in/out com scroll
-            container.attr("transform", event.transform);
-
-			// Atualiza a malha de fundo conforme o zoom do SVG
+	const svg = d3.select("#grafo-exibicao").append("svg")
+		.attr("width", width)
+		.attr("height", height)
+		.call(d3.zoom().on("zoom", (event) => {
+			container.attr("transform", event.transform);
 			const zoomLevel = event.transform.k;
 			grafoContainer.style.backgroundSize = `${35 * zoomLevel}px ${35 * zoomLevel}px`;
-        }));
+		}));
 
-    const container = svg.append("g");
+	const container = svg.append("g");
 
-    // Definição das setas das arestas
-    container.append("defs").append("marker")
-        .attr("id", "arrow")
-        .attr("viewBox", "0 -5 10 10")
-        .attr("refX", 18)
-        .attr("refY", 0)
-        .attr("markerWidth", 15)
-        .attr("markerHeight", 15)
-        .attr("orient", "auto")
-        .append("path")
-        .attr("d", "M0,-5L10,0L0,5")
-        .attr("fill", "#9dbaea");
+	// Simulação com força
+	const simulation = d3.forceSimulation(nodes)
+		.force("link", d3.forceLink(links).id(d => d.id).distance(300))
+		.force("charge", d3.forceManyBody().strength(-60))
+		.force("center", d3.forceCenter(width / 2, height / 2));
 
-    const simulation = d3.forceSimulation(nodes)
-        .force("link", d3.forceLink(links).id(d => d.id).distance(300))
-        .force("charge", d3.forceManyBody().strength(-60))
-        .force("center", d3.forceCenter(width / 2, height / 2));
+	// Arestas (sem direção)
+	const link = container.selectAll(".link")
+		.data(links)
+		.enter().append("line")
+		.attr("class", "link")
+		.style("stroke", "#9dbaea")
+		.style("stroke-width", 2);
 
-    const link = container.selectAll(".link")
-        .data(links)
-        .enter().append("line")
-        .attr("class", "link");
+	const node = container.selectAll(".node")
+		.data(nodes)
+		.enter().append("g")
+		.attr("class", "node");
 
-    const node = container.selectAll(".node")
-        .data(nodes)
-        .enter().append("g")
-        .attr("class", "node");
+	node.append("circle").attr("r", 30);
 
-    node.append("circle").attr("r", 30);
+	node.append("text").text(d => d.id).attr("dy", 5);
 
-    node.append("text")
-        .text(d => d.id)
-        .attr("dy", 5);
+	// Adiciona o valor (peso) das arestas no ponto médio
+	const linkLabel = container.selectAll(".link-label")
+		.data(links)
+		.enter().append("text")
+		.attr("class", "link-label")
+		.attr("fill", "#333")
+		.attr("font-size", "14px")
+		.attr("text-anchor", "middle")
+		.text(d => d.value);
 
-    simulation.on("tick", () => {
-        link
-            .attr("x1", d => d.source.x)
-            .attr("y1", d => d.source.y)
-            .attr("x2", d => d.target.x)
-            .attr("y2", d => d.target.y);
+	simulation.on("tick", () => {
+		link
+			.attr("x1", d => d.source.x)
+			.attr("y1", d => d.source.y)
+			.attr("x2", d => d.target.x)
+			.attr("y2", d => d.target.y);
 
-        node.attr("transform", d => `translate(${d.x},${d.y})`);
-    });
+		linkLabel
+		.attr("x", d => (d.source.x + d.target.x) / 2)
+		.attr("y", d => (d.source.y + d.target.y) / 2);
 
-    const drag = d3.drag()
-        .on("start", (event, d) => {
-            if (!event.active) simulation.alphaTarget(0.3).restart();
-            d.fx = d.x;
-            d.fy = d.y;
-        })
-        .on("drag", (event, d) => {
-            d.fx = event.x;
-            d.fy = event.y;
-        })
-        .on("end", (event, d) => {
-            if (!event.active) simulation.alphaTarget(0);
-            d.fx = null;
-            d.fy = null;
-        });
 
-    node.call(drag);
+		node.attr("transform", d => `translate(${d.x},${d.y})`);
+	});
 
-    // Implementação do arrasto (pan) com botão do meio do mouse
-    let isPanning = false;
-    let startX, startY;
-    
-    svg.on("mousedown", (event) => {
-        if (event.button === 1) { // Botão do meio do mouse
-            isPanning = true;
-            startX = event.clientX;
-            startY = event.clientY;
-        }
-    });
+	const drag = d3.drag()
+		.on("start", (event, d) => {
+			if (!event.active) simulation.alphaTarget(0.3).restart();
+			d.fx = d.x;
+			d.fy = d.y;
+		})
+		.on("drag", (event, d) => {
+			d.fx = event.x;
+			d.fy = event.y;
+		})
+		.on("end", (event, d) => {
+			if (!event.active) simulation.alphaTarget(0);
+			d.fx = null;
+			d.fy = null;
+		});
 
-    svg.on("mousemove", (event) => {
-        if (isPanning) {
-            let dx = event.clientX - startX;
-            let dy = event.clientY - startY;
-            container.attr("transform", `translate(${dx},${dy})`);
-        }
-    });
-
-    svg.on("mouseup", () => isPanning = false);
-    svg.on("mouseleave", () => isPanning = false);
+	node.call(drag);
 }
 
 async function adicionarNode() {
@@ -206,9 +183,16 @@ async function conectarNodes() {
 	let de = document.querySelector('#select-de');
 	let para = document.querySelector('#select-para');
 	let exemplo = document.querySelector('select#preset');
+	let pesoInput = document.querySelector('#valorAresta');
 
-	var link = { source: de.value, target: para.value };
+	let valor = parseFloat(pesoInput.value);
 
+	if (isNaN(valor)) {
+		alert("Informe um valor numérico para o peso da aresta.");
+		return;
+	}
+
+	let link = { source: de.value, target: para.value, value: valor };
 
 	let resposta = await fetch(`/link/${exemplo.value}`, { method: 'POST', body: JSON.stringify(link) });
 	if (!resposta.ok) {
@@ -217,8 +201,11 @@ async function conectarNodes() {
 
 	links.push(link);
 
+	pesoInput.value = ''; // limpa campo de valor
+
 	await atualizar();
 }
+
 
 // isso faz questão de manter salvo o exemplo selecionado para que o usuário
 // veja o mesmo exemplo toda vez que recarregue a página.
@@ -247,6 +234,7 @@ async function trocarExemplo(evento) {
 		throw resposta.ok;
 	}
 	let { nodes: nodes_, links: links_ } = await resposta.json();
+	console.log(links_);
 	nodes = nodes_;
 	links = links_;
 
@@ -480,10 +468,4 @@ function creditos() {
 }
 
 
-
-
-
-
-
 trocarExemplo();
-
