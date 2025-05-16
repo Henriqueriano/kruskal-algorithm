@@ -21,18 +21,26 @@
 
     <fieldset id="inputs">
       <legend>Adicionar Nós</legend>
-      <div>
-        <input id="nameNode" type="text" placeholder="Nome do novo nó..."
-            style="margin-bottom: 10px; display: inline; width: 45%;">
-        <input type="number" id="valorAresta" placeholder="Valor da aresta">
-        <input id="nameNode" type="text" placeholder="Nome do novo nó..."
-            style="margin-bottom: 10px; display: inline; width: 45%;">
-      </div>
-      <form onsubmit="adicionarNode()" action="javascript:void(0)">
-        <button type="submit" onsubmit="" style="width: 100%;">Adicionar</button>
+      <form action="/add_node" method="post" class="formAdd">
+        <div>
+          <label for="node_id">ID do novo nó:</label>
+          <input type="text" name="node_id" 
+            style="margin-bottom: 10px; width: 20%;" required>
+          
+          <label for="target">Conectar a:</label>
+          <input type="text" name="target"
+            style="margin-bottom: 10px; width: 20%;">
+        </div>
+        <label for="value">Peso da conexão:</label>
+        <input type="number" name="value"
+          style="margin-bottom: 10px; width: 45%;" min="1">
+        
+        <button type="submit">Adicionar Nó</button>
       </form>
-      <form onsubmit="deletarNode()" action="javascript:void(0)">
-        <button type="submit" onsubmit="" style="width: 100%;">Deletar</button>
+      <form method="POST" action="/remove_node">
+        <label for="node_id">ID do Nó a Remover:</label>
+        <input type="text" name="node_id" required>
+        <button type="submit">Remover</button>
       </form>
     </fieldset>
 
@@ -44,32 +52,6 @@
         <option value="binaria">Arvore Binária</option>
       </select>
     </fieldset>
-
-    <!-- <fieldset id="inputs"> -->
-    <!--   <legend>Matriz Adjacência</legend> -->
-    <!--   <div style="margin-bottom: 5px;"> -->
-    <!---->
-    <!--     <input type="checkbox" id="exibir-rotulos" value="" style="vertical-align: middle;" -->
-    <!--       onchange="atualizarMatrizAdjacencia()"> -->
-    <!--     <label for="exibir-rotulos" style="vertical-align: middle;">Exibir rótulos</label> -->
-    <!--   </div> -->
-    <!--   <button id="matriz-toggle" type="submit" style="width: 100%" onclick="toggleMatrizAdjacencia()">Exibir</button> -->
-    <!-- </fieldset> -->
-    <!---->
-    <!-- <fieldset id="inputs"> -->
-    <!--   <legend>Lista Adjacência</legend> -->
-    <!--   <button id="lista-toggle" type="submit" style="width: 100%" onclick="toggleListaAdjacencia()">Exibir</button> -->
-    <!-- </fieldset> -->
-    <!---->
-    <!-- <fieldset id="inputs"> -->
-    <!--   <legend>Grau dos Nós</legend> -->
-    <!--   <button id="grau-toggle" type="submit" style="width: 100%" onclick="toggleGrausNos()">Exibir</button> -->
-    <!-- </fieldset> -->
-    <!---->
-    <!-- <fieldset id="inputs"> -->
-    <!--   <legend>Grau Total</legend> -->
-    <!--   <button id="grau-total-toggle" type="submit" style="width: 100%" onclick="toggleGrauTotal()">Exibir</button> -->
-    <!-- </fieldset> -->
 
     <fieldset id="inputs">
       <legend>Tipos do grafo</legend>
