@@ -218,5 +218,24 @@ function creditos() {
     }
 }
 
+function lista() {
+    let listaDiv = document.querySelector('#lista');
+    let butao = document.querySelector('#lista-toggle');
+    
+    // Ordenar as arestas aqui
+    const orderedEdges = [...links].sort((a, b) => a.value - b.value);
+    const edgesListHtml = orderedEdges.map(edge => 
+        `(${edge.source.id}, ${edge.target.id}): ${edge.value}`
+    ).join('<br>');
+
+    listaDiv.innerHTML = `<b>Arestas Ordenadas:</b><br>${edgesListHtml}`;
+    
+    listaDiv.classList.toggle('hidden');
+    if (listaDiv.classList.contains('hidden')) {
+        butao.textContent = 'Exibir Lista';
+    } else {
+        butao.textContent = 'Esconder Lista';
+    }
+}
 
 trocarExemplo();
