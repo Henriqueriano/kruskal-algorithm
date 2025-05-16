@@ -1,5 +1,5 @@
-from flask import Flask, render_template, request, redirect, url_for
-from main import grafo, get_graph_data, add_aresta, remove_vertice
+from flask import Flask, render_template, request, redirect, url_for, jsonify
+from main import grafo, get_graph_data, add_aresta, remove_vertice, kruskal
 
 app = Flask(__name__)
 
@@ -29,3 +29,22 @@ def remove_node():
     if vertice:
         remove_vertice(vertice)
     return redirect(url_for("hello_world"))
+
+@app.route("/kruskal")
+def get_kruskal():
+    arvore = kruskal(grafo)
+    arestas_arvore = set(arvore)  # Converter para set para busca rápida
+    
+    nodes = set()
+    for a, _, b in grafo:
+        nodes.update([a, b])
+    
+    links = []
+    for a, peso, b in grafo:
+        eh_agm = (a, peso, b) in arestas_arvore or (b, peso, a) in arestas_arvore # Verifica se a aresta está na AGM
+        links.append({'source': a, 'target': b, 'value': peso, 'agm': eh_agm})
+    
+    return jsonify({
+        'nodes': [{'id': n} for n in nodes],
+        'links': links
+    })

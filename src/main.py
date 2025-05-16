@@ -10,29 +10,40 @@ grafo: grafo = {
     ("g", 2, "f"),
 }
 
+# Implementação do Union-Find
+def find(parent: dict[vertice, vertice], vertice: vertice) -> vertice:
+    if parent[vertice] == vertice:
+        return vertice
+    parent[vertice] = find(parent, parent[vertice])  # Path compression
+    return parent[vertice]
+
+def union(parent: dict[vertice, vertice], a: vertice, b: vertice) -> None:
+    root_a = find(parent, a)
+    root_b = find(parent, b)
+    if root_a != root_b:
+        parent[root_a] = root_b
+
 # A
 def kruskal(entrada: grafo) -> list[aresta]:
     ordenado = sorted(entrada, key=lambda x: x[1])
-    visitados: set[vertice] = set()
+    parent: dict[vertice, vertice] = {v: v for aresta in entrada for v in (aresta[0], aresta[2])} # Inicializa Union-Find
     retorno: list[aresta] = []
 
     for conjunto in ordenado:
         a, _, b = conjunto
-        if a in visitados and b in visitados:
-            continue
-        visitados.add(a)
-        visitados.add(b)
-        retorno.append(conjunto)
+        if find(parent, a) != find(parent, b):  # Verifica se estão em conjuntos diferentes
+            union(parent, a, b)  # Une os conjuntos
+            retorno.append(conjunto)
 
     return retorno
 
-# C & B
-def diff(a: grafo, b: grafo) -> list[aresta]:
-    return list(a.difference(b))
+# # C & B
+# def diff(a: grafo, b: grafo) -> list[aresta]:
+#     return list(a.difference(b))
 
-# D
-def verificar_arvore_geradora_minima(a: grafo) -> bool:
-    return set(kruskal(a)) == a
+# # D
+# def verificar_arvore_geradora_minima(a: grafo) -> bool:
+#     return set(kruskal(a)) == a
 
 # Suporte à adição de arestas
 def add_aresta(origem: vertice, peso: int, destino: vertice) -> None:

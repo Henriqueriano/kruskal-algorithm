@@ -17,14 +17,25 @@ var nodes = [
 
 // Declaração das arestas valoradas
 var links = [
-	{ source: "A", value: 2, target: "B" },
-	{ source: "A", value: 4, target: "C" },
-	{ source: "B", value: 1, target: "C" },
-	{ source: "C", value: 5, target: "D" },
-	{ source: "D", value: 3, target: "E" }
+	{ source: "A", target: "B", value: 2 },
+	{ source: "A", target: "C", value: 4 },
+	{ source: "B", target: "C", value: 1 },
+	{ source: "C", target: "D", value: 5,},
+	{ source: "D", target: "E", value: 3 }
 ];
 
-// D3 usa a referência desses dois objetos para salvar informações essenciais dos nós como posição e etc.
+async function rodarKruskal() {
+    let resposta = await fetch(`/kruskal`, { method: 'GET' });
+    if (!resposta.ok) {
+        throw resposta.ok;
+    }
+    let { nodes: nodes_, links: links_ } = await resposta.json();
+    nodes = nodes_;
+    links = links_;
+    await atualizar();
+}
+
+document.querySelector('#runKruskal').addEventListener('click', rodarKruskal);
 
 function renderizar(nodes, links) {
 	document.querySelector("#grafo-exibicao").innerHTML = '';
@@ -32,45 +43,51 @@ function renderizar(nodes, links) {
 
 	const svg = d3.select("#grafo-exibicao").append("svg")
 		.attr("width", width)
-		.attr("height", height)
-		.call(d3.zoom().on("zoom", (event) => {
-			container.attr("transform", event.transform);
-			const zoomLevel = event.transform.k;
-			grafoContainer.style.backgroundSize = `${35 * zoomLevel}px ${35 * zoomLevel}px`;
-		}));
+		.attr("height", height);
 
 	const container = svg.append("g");
 
-	// Simulação com força
+	const zoom = d3.zoom().on("zoom", (event) => {
+		container.attr("transform", event.transform);
+		const zoomLevel = event.transform.k;
+		grafoContainer.style.backgroundSize = `${35 * zoomLevel}px ${35 * zoomLevel}px`;
+	});
+	svg.call(zoom);
+	svg.call(zoom.transform, d3.zoomIdentity);
+
+	nodes.forEach(node => {
+		if (node.x === undefined) node.x = Math.random() * width;
+		if (node.y === undefined) node.y = Math.random() * height;
+	});
+
 	const simulation = d3.forceSimulation(nodes)
-	.force("link", d3.forceLink(links)
-		.id(d => d.id)
-		.distance(180)) // ou qualquer fórmula baseada nos dados
+		.force("link", d3.forceLink(links).id(d => d.id).distance(180))
+		.force("charge", d3.forceManyBody().strength(-900))
+		.force("center", d3.forceCenter(width / 2, height / 2))
+		.force("collision", d3.forceCollide().radius(35))
+		.alphaDecay(0.02);
 
-	.force("charge", d3.forceManyBody().strength(-900)) // ← aqui controla a repulsão
-	.force("center", d3.forceCenter(width / 2, height / 2))
-	.force("collision", d3.forceCollide().radius(35)); // ← evita sobreposição direta
+	simulation.alpha(1);
+	simulation.restart();
 
-
-
-	// Arestas (sem direção)
-	const link = container.selectAll(".link")
-		.data(links)
-		.enter().append("line")
-		.attr("class", "link")
-		.style("stroke", "#9dbaea")
-		.style("stroke-width", 2);
-
+	// Arestas
+	 const link = container.selectAll(".link")
+        .data(links)
+        .enter().append("line")
+        .attr("class", "link")
+        .style("stroke", d => d.agm ? "green" : "#9dbaea") // Arestas da AGM em verde
+        .style("stroke-width", d => d.agm ? 4 : 2); // Arestas da AGM mais grossas
+		
+	// Nós
 	const node = container.selectAll(".node")
 		.data(nodes)
 		.enter().append("g")
 		.attr("class", "node");
 
 	node.append("circle").attr("r", 30);
-
 	node.append("text").text(d => d.id).attr("dy", 5);
 
-	// Adiciona o valor (peso) das arestas no ponto médio
+	// Labels das arestas (pesos)
 	const linkLabel = container.selectAll(".link-label")
 		.data(links)
 		.enter().append("text")
@@ -80,6 +97,7 @@ function renderizar(nodes, links) {
 		.attr("text-anchor", "middle")
 		.text(d => d.value);
 
+	// Atualiza posições a cada tick da simulação
 	simulation.on("tick", () => {
 		link
 			.attr("x1", d => d.source.x)
@@ -88,9 +106,8 @@ function renderizar(nodes, links) {
 			.attr("y2", d => d.target.y);
 
 		linkLabel
-		.attr("x", d => (d.source.x + d.target.x) / 2)
-		.attr("y", d => (d.source.y + d.target.y) / 2);
-
+			.attr("x", d => (d.source.x + d.target.x) / 2)
+			.attr("y", d => (d.source.y + d.target.y) / 2);
 
 		node.attr("transform", d => `translate(${d.x},${d.y})`);
 	});
@@ -114,6 +131,31 @@ function renderizar(nodes, links) {
 	node.call(drag);
 }
 
+function addLinkToGraph(edge) {
+  // D3 precisa que source/target sejam os objetos reais dos nós, não apenas strings
+  const sourceNode = nodes.find(n => n.id === edge.source);
+  const targetNode = nodes.find(n => n.id === edge.target);
+
+  if (!sourceNode || !targetNode) {
+    console.warn('Nó não encontrado:', edge);
+    return;
+  }
+
+  const alreadyExists = links.some(l =>
+    (l.source.id === sourceNode.id && l.target.id === targetNode.id) ||
+    (l.source.id === targetNode.id && l.target.id === sourceNode.id)
+  );
+
+  if (!alreadyExists) {
+    links.push({
+      source: sourceNode,
+      target: targetNode,
+      value: edge.value
+    });
+
+    renderizar(nodes, links);
+  }
+}
 
 // isso faz questão de manter salvo o exemplo selecionado para que o usuário
 // veja o mesmo exemplo toda vez que recarregue a página.
