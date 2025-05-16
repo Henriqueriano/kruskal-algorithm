@@ -43,9 +43,15 @@ function renderizar(nodes, links) {
 
 	// Simulação com força
 	const simulation = d3.forceSimulation(nodes)
-		.force("link", d3.forceLink(links).id(d => d.id).distance(300))
-		.force("charge", d3.forceManyBody().strength(-60))
-		.force("center", d3.forceCenter(width / 2, height / 2));
+	.force("link", d3.forceLink(links)
+		.id(d => d.id)
+		.distance(180)) // ou qualquer fórmula baseada nos dados
+
+	.force("charge", d3.forceManyBody().strength(-900)) // ← aqui controla a repulsão
+	.force("center", d3.forceCenter(width / 2, height / 2))
+	.force("collision", d3.forceCollide().radius(35)); // ← evita sobreposição direta
+
+
 
 	// Arestas (sem direção)
 	const link = container.selectAll(".link")
@@ -70,7 +76,7 @@ function renderizar(nodes, links) {
 		.enter().append("text")
 		.attr("class", "link-label")
 		.attr("fill", "#333")
-		.attr("font-size", "14px")
+		.attr("font-size", "20px")
 		.attr("text-anchor", "middle")
 		.text(d => d.value);
 

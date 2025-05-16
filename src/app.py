@@ -11,13 +11,13 @@ def hello_world():
 @app.route("/node/<exemplo>")
 def exemplo(exemplo: str):
     e: main.grafo = {
-        ("a", 2, "b"), ("a", 2, "c"), ("a", 10, "d"), ("d", 8, "c"), ("c", 5, "h"),
-        ("e", 3, "a"), ("d", 10, "e"), ("g", 30, "d"), ("g", 31, "a"), ("b", 3, "c"),
-        ("g", 80, "j"), ("j", 1, "k"), ("i", 3, "k"), ("i", 5, "a"), ("j", 8, "a"),
-        ("j", 6, "f"), ("j", 5, "b"), ("b", 30, "d"),
+        ("a", 4, "b"), ("a", 8, "h"), ("b", 11, "h"), ("b", 8, "c"),
+        ("c", 7, "d"), ("c", 2, "i"), ("c", 4, "f"), ("d", 9, "e"), 
+        ("d", 14, "f"), ("e", 10, "f"), ("h", 1, "g"), ("i", 7, "h"), ("i", 6, "g"),
+        ("g", 2, "f"),
     }
     n: set[str] = set()
     n |= set(map(lambda x: x[0], e)) | set(map(lambda x: x[2], e))
-    l: list[dict[str, str]] = [{'source': a, 'target': b} for a, _, b in e]
+    l: list[dict[str, int, str]] = [{'source': a, 'value': value, 'target': b} for a, value, b in e]
     
     return { 'nodes': [{'id': i} for i in n], 'links': l, }
