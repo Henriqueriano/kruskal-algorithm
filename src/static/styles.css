@@ -12,7 +12,7 @@ body {
 }
 
 header {
-	width: 30%;
+	width: 20%;
 	position: relative;
 	z-index: 1;
 	background-color: white;
@@ -24,6 +24,12 @@ header {
 	row-gap: 10px;
 	height: 100vh;
 	padding: 0 20px 0 20px;
+}
+
+#operations {
+	display: flex;
+	flex-direction: column;
+	width: auto;
 }
 
 .latex-display {

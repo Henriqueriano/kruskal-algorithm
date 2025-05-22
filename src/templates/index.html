@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dígrafos</title>
+  <title>AGM</title>
   <script src="https://d3js.org/d3.v6.min.js"></script>
   <script src="https://unpkg.com/d3-force@3"></script>
   <script src="https://unpkg.com/d3-sankey@0.12"></script>
@@ -21,27 +21,27 @@
 
     <fieldset id="inputs">
       <legend>Adicionar Nós</legend>
-      <form action="/add_node" method="post" class="formAdd">
-        <div>
+      <div id="operations">
+        <form action="/add_node" method="post" class="formAdd">
           <label for="node_id">ID do novo nó:</label>
           <input type="text" name="node_id" 
-            style="margin-bottom: 10px; width: 20%;" required>
+            style="margin-bottom: 10px;" required>
           
           <label for="target">Conectar a:</label>
           <input type="text" name="target"
-            style="margin-bottom: 10px; width: 20%;">
-        </div>
-        <label for="value">Peso da conexão:</label>
-        <input type="number" name="value"
-          style="margin-bottom: 10px; width: 45%;" min="1">
-        
-        <button type="submit">Adicionar Nó</button>
-      </form>
-      <form method="POST" action="/remove_node">
-        <label for="node_id">ID do Nó a Remover:</label>
-        <input type="text" name="node_id" required>
-        <button type="submit">Remover</button>
-      </form>
+            style="margin-bottom: 10px;">
+          <label for="value">Peso da conexão:</label>
+          <input type="number" name="value"
+            style="margin-bottom: 10px;" min="1">
+          
+          <button type="submit">Adicionar Nó</button>
+        </form>
+        <form method="POST" action="/remove_node">
+          <label for="node_id">ID do Nó a Remover:</label>
+          <input type="text" name="node_id" required>
+          <button type="submit">Remover</button>
+        </form>
+      </div>
     </fieldset>
 
     <fieldset>
@@ -56,34 +56,6 @@
         <option value="completo">Grafo Completo</option>
         <option value="binaria">Arvore Binária</option>
       </select>
-    </fieldset>
-
-    <fieldset id="inputs">
-      <legend>Tipos do grafo</legend>
-      <div>Possui laços: <span id="tipo-lacos"></span></div>
-      <div>Grafo completo: <span id="tipo-grafo-completo"></span></div>
-      <div>Grafo simples: <span id="tipo-simples"></span></div>
-      <hr>
-      <div>
-        <label style="" for="arvore-raiz">Nó raiz:</label>
-        <select onchange="atualizarTiposDoGrafo()" id="arvore-raiz">
-        </select>
-      </div>
-      <input style="vertical-align: middle;" type="checkbox" id="considerar-subgrafo" onchange="atualizarTiposDoGrafo()"
-        checked>
-      <label style="vertical-align: middle;" for="considerar-subgrafo">Considerar subgrafo</label>
-      <div>Árvore: <span id="tipo-arvore"></span></div>
-      <ul style="margin: 0;">
-        <li>
-          <div>Binária: <span id="tipo-binaria"></span></div>
-        </li>
-        <li>
-          <div>Completa: <span id="tipo-completa"></span></div>
-        </li>
-        <li>
-          <div>Cheia: <span id="tipo-cheia"></span></div>
-        </li>
-      </ul>
     </fieldset>
 
     <fieldset id="inputs">
